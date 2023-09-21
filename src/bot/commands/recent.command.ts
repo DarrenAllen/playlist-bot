@@ -1,4 +1,3 @@
-import { SlashCommandPipe } from '@discord-nestjs/common';
 import { Inject } from '@nestjs/common';
 import { Cache } from 'cache-manager';
 import {
@@ -6,6 +5,7 @@ import {
   EventParams,
   Handler,
   InjectDiscordClient,
+  InteractionEvent,
 } from '@discord-nestjs/core';
 import {
   ClientEvents,
@@ -22,6 +22,8 @@ import { TABLES } from 'src/utils/constants';
 import { UsersService } from 'src/users/users.service';
 import * as dotenv from 'dotenv';
 import { ServersService } from 'src/servers/servers.service';
+import { RecentDto } from '../dto/recent';
+import { SlashCommandPipe } from '@discord-nestjs/common';
 
 dotenv.config();
 const { SPOTIFY_ID, SPOTIFY_SECRET } = process.env;
@@ -30,7 +32,7 @@ const { SPOTIFY_ID, SPOTIFY_SECRET } = process.env;
   name: 'recent',
   description: 'Lists recent additions ot the playlist',
 })
-export class PlayCommand {
+export class RecentCommand {
   constructor(
     @InjectKnex() private readonly knex: Knex,
     @InjectDiscordClient()
@@ -69,6 +71,7 @@ export class PlayCommand {
     const previousTracks = await this.knex(TABLES.tracks)
       .select()
       .where({ playlistid });
+
     // const totalTracks = await this.getAllPlaylistTracks(playlistId);
     // get the tracks from the playlist
     const tracks = await this.getAllPlaylistTracks(playlistid);
@@ -121,6 +124,9 @@ export class PlayCommand {
         case 'suwan':
           fileName = 'suwan.png';
           break;
+        case 'harold':
+          fileName = 'harold.webp';
+          break;
         default:
           fileName = 'daz.webp';
           break;
@@ -154,7 +160,8 @@ export class PlayCommand {
     }
   }
   @Handler()
-  async onPlayCommand(
+  async onRecentCommand(
+    @InteractionEvent(SlashCommandPipe) dto: RecentDto,
     @EventParams() args: ClientEvents['interactionCreate'],
   ): Promise<string> {
     const message = "Let's see what's been added to the playlist recently!";
@@ -166,7 +173,9 @@ export class PlayCommand {
 
     setImmediate(async () => {
       const newTracks = await this.getNewPlaylistTracks(playlistId);
-      this.sendToChannel(newTracks, channelId);
+      if (!dto.silent) {
+        this.sendToChannel(newTracks, channelId);
+      }
     });
 
     return message;

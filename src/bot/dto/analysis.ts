@@ -1,5 +1,4 @@
 import { Param } from '@discord-nestjs/core';
-import { Transform } from 'class-transformer';
 
 export class AnalysisDto {
   @Param({

@@ -8,7 +8,7 @@ import {
   InteractionEvent,
   InjectDiscordClient,
 } from '@discord-nestjs/core';
-import { ClientEvents, Client as DiscordClient, TextChannel } from 'discord.js';
+import { ClientEvents, Client as DiscordClient } from 'discord.js';
 import { Client } from 'spotify-api.js';
 import { InjectKnex, Knex } from 'nestjs-knex';
 import { CACHE_MANAGER } from '@nestjs/cache-manager';
@@ -17,6 +17,7 @@ import { omit } from 'lodash';
 import { KEYS } from 'src/utils/constants';
 import * as dotenv from 'dotenv';
 dotenv.config();
+
 const { SPOTIFY_ID, SPOTIFY_SECRET } = process.env;
 @Command({
   name: 'features',
@@ -43,7 +44,7 @@ export class FeaturesCommand {
   }
 
   @Handler()
-  async onAnalysisCommand(
+  async onFeaturesCommand(
     @InteractionEvent(SlashCommandPipe) dto: AnalysisDto,
     @EventParams() args: ClientEvents['interactionCreate'],
   ): Promise<string> {

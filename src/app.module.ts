@@ -42,12 +42,12 @@ const { DB_PORT, DB_PASSWORD, DB_NAME, DB_USER, DB_HOST } = process.env;
             GatewayIntentBits.MessageContent,
           ],
         },
-        registerCommandOptions: [
-          {
-            forGuild: configService.get('GUILD_ID_WITH_COMMANDS'),
-            removeCommandsBefore: true,
-          },
-        ],
+        // registerCommandOptions: [
+        //   {
+        //     forGuild: configService.get('GUILD_ID_WITH_COMMANDS'),
+        //     removeCommandsBefore: true,
+        //   },
+        // ],
         failOnLogin: true,
       }),
       inject: [ConfigService],

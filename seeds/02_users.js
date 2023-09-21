@@ -1,4 +1,4 @@
-const { NANI, AX, DAZ, BLACKSUWAN, BERTHOLOMEW } = process.env;
+const { NANI, AX, DAZ, BLACKSUWAN, BERTHOLOMEW, HAROLD } = process.env;
 exports.seed = async function (knex) {
   const toInsert = [];
 
@@ -31,6 +31,12 @@ exports.seed = async function (knex) {
     externalid: BERTHOLOMEW,
     nickname: 'bert',
     serverid: 1,
+  });
+  toInsert.push({
+    username: 'Harold',
+    externalid: HAROLD,
+    nickname: 'harold',
+    serverid: 2,
   });
 
   // Deletes ALL existing entries

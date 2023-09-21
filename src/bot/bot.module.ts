@@ -1,6 +1,6 @@
 import { DiscordModule } from '@discord-nestjs/core';
 import { Module } from '@nestjs/common';
-import { PlayCommand } from './commands/play.command';
+import { RecentCommand } from './commands/recent.command';
 import { AnalysisCommand } from './commands/analysis.command';
 import { FeaturesCommand } from './commands/features.command';
 import { PlaylistFeaturesCommand } from './commands/playlistfeatures.command';
@@ -13,7 +13,7 @@ import { ArtistCommand } from './commands/artists.command';
 @Module({
   imports: [DiscordModule.forFeature()],
   providers: [
-    PlayCommand,
+    RecentCommand,
     AnalysisCommand,
     FeaturesCommand,
     PlaylistFeaturesCommand,
