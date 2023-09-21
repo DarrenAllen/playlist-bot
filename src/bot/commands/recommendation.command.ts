@@ -99,7 +99,7 @@ export class RecommendationCommand {
   async getPlaylistRecommendations(
     playlistid,
     channelId: string,
-    recplaylistid: string,
+    serverid: number,
   ) {
     const tracks = (
       await this.knex.raw(
@@ -109,26 +109,44 @@ export class RecommendationCommand {
         [playlistid],
       )
     ).rows;
+    console.info('TRACKS', tracks.length);
     // get 5 random tracks
     // Shuffle array
-    const users = await this.userService.getUsers();
+    const users = await this.userService.getUsers(serverid);
+    console.info('USers!', users);
+
     const playlistArtists = (
       await this.playlistService.getPlaylistArtists(playlistid)
     ).map(({ uri }) => uri);
+    console.info('playlistArtists', playlistArtists.length);
     const selectedTracks = [];
+    if (users.length > 5) {
+      throw new Error('Too many members of server');
+    }
+
     users.forEach(({ externalid }) => {
       const filteredTracks = tracks.filter(
-        ({ addedby }) => addedby === externalid,
+        ({ addedby }) => addedby == externalid,
       );
+      console.info('filtereed', filteredTracks[0]);
       const shuffled = filteredTracks.sort(() => 0.5 - Math.random());
-      const selectedTrack = shuffled.slice(0, 1)[0];
+      // If there are only two users, use two tracks, otherwise one
+      if (users.length === 2) {
+        const currentTracks = shuffled.slice(0, 2);
 
-      selectedTracks.push(selectedTrack);
+        selectedTracks.push(currentTracks[0]);
+        selectedTracks.push(currentTracks[1]);
+      } else {
+        const selectedTrack = shuffled.slice(0, 1)[0];
+
+        selectedTracks.push(selectedTrack);
+      }
     });
+    console.info('SELECTED', selectedTracks);
     const seed_tracks = selectedTracks
       .map((track) => track.uri.split(':').slice(-1)[0])
       .join(',');
-
+    console.info('seedtracks!', seed_tracks);
     // Let's not get live songs...
     const max_liveness = 0.5;
     // let's not get extra short or long songs
@@ -178,14 +196,11 @@ export class RecommendationCommand {
     const server = await this.serverService.getServer(args[0].guildId);
 
     const playlistId = server.playlistid;
-    const recplaylistid = server.recplaylistid;
+    const serverid = server.serverid;
+
     const channelId = args[0].channelId;
     setImmediate(async () => {
-      await this.getPlaylistRecommendations(
-        playlistId,
-        channelId,
-        recplaylistid,
-      );
+      await this.getPlaylistRecommendations(playlistId, channelId, serverid);
     });
 
     return messageTitle;

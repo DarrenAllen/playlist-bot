@@ -9,14 +9,16 @@ export class UsersService {
     @InjectKnex() private readonly knex: Knex,
     @Inject(CACHE_MANAGER) private cacheManager: Cache,
   ) {}
-  async getUsers() {
-    const cachedResult: any[] = await this.cacheManager.get('users');
+  async getUsers(serverid = 1) {
+    const cachedResult: any[] = await this.cacheManager.get(
+      `users_${serverid}`,
+    );
 
     if (cachedResult) {
       return cachedResult;
     } else {
-      const users = await this.knex(TABLES.users).select();
-      await this.cacheManager.set('users', users); // a day
+      const users = await this.knex(TABLES.users).select().where({ serverid });
+      await this.cacheManager.set(`users_${serverid}`, users); // a day
       return users;
     }
   }
