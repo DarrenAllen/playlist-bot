@@ -1,0 +1,5 @@
+import xml.etree.ElementTree as ET
+tree = ET.parse('Drums.xml')
+root = tree.getroot()
+for child in root:
+    print(child.tag, child.attrib, child.text)
