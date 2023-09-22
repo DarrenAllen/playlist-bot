@@ -24,6 +24,7 @@ import * as dotenv from 'dotenv';
 import { ServersService } from 'src/servers/servers.service';
 import { RecentDto } from '../dto/recent';
 import { SlashCommandPipe } from '@discord-nestjs/common';
+import { Cron } from '@nestjs/schedule';
 
 dotenv.config();
 const { SPOTIFY_ID, SPOTIFY_SECRET } = process.env;
@@ -95,15 +96,15 @@ export class RecentCommand {
     return newlyAddedTracks;
   }
 
-  async sendToChannel(tracks = [], channelId) {
+  async sendToChannel(tracks = [], channelId, serverid) {
     if (tracks.length === 0) {
-      const channel = await this.discordClient.channels.cache.get(channelId);
-
-      await (channel as TextChannel).send(
-        "Nothing new's been added to the playlist...",
-      );
+      console.info("Nothing new's been added to the playlist");
+      // const channel = await this.discordClient.channels.cache.get(channelId);
+      // await (channel as TextChannel).send(
+      //   "Nothing new's been added to the playlist...",
+      // );
     }
-    const users = await this.userService.getUsers();
+    const users = await this.userService.getUsers(serverid);
 
     for (const track of tracks) {
       await sleep(2000);
@@ -159,6 +160,27 @@ export class RecentCommand {
       });
     }
   }
+  // every day, check previous day's entries
+  @Cron('*/10 * * * *')
+  async intervalSync() {
+    // for each server
+    const servers = await this.serverService.getServers();
+    for (const server of servers) {
+      console.info('OK 45!', server);
+
+      const { playlistid, updateschannel, serverid } = server;
+      if (updateschannel) {
+        try {
+          const newTracks = await this.getNewPlaylistTracks(playlistid);
+          this.sendToChannel(newTracks, updateschannel, serverid);
+          await sleep(60000);
+        } catch (err) {
+          console.error(err);
+        }
+      }
+    }
+  }
+
   @Handler()
   async onRecentCommand(
     @InteractionEvent(SlashCommandPipe) dto: RecentDto,
@@ -170,11 +192,11 @@ export class RecentCommand {
     const server = await this.serverService.getServer(args[0].guildId);
 
     const playlistId = server.playlistid;
-
+    const serverid = server.serverid;
     setImmediate(async () => {
       const newTracks = await this.getNewPlaylistTracks(playlistId);
       if (!dto.silent) {
-        this.sendToChannel(newTracks, channelId);
+        this.sendToChannel(newTracks, channelId, serverid);
       }
     });
 

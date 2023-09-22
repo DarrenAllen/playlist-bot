@@ -11,6 +11,8 @@ import { UsersService } from './users/users.service';
 import { PlaylistService } from './playlist/playlist.service';
 import { ServersService } from './servers/servers.service';
 import * as dotenv from 'dotenv';
+import { ScheduleModule } from '@nestjs/schedule';
+
 dotenv.config();
 const { DB_PORT, DB_PASSWORD, DB_NAME, DB_USER, DB_HOST } = process.env;
 
@@ -53,6 +55,7 @@ const { DB_PORT, DB_PASSWORD, DB_NAME, DB_USER, DB_HOST } = process.env;
       inject: [ConfigService],
     }),
     BotModule,
+    ScheduleModule.forRoot(),
   ],
   controllers: [AppController],
   providers: [AppService, UsersService, PlaylistService, ServersService],
