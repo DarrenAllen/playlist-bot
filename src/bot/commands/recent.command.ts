@@ -110,6 +110,10 @@ export class RecentCommand {
 
     for (const track of tracks) {
       await sleep(2000);
+      this.logger.log(`Track found ${track.addedBy.uri}`);
+      this.logger.log(
+        `Checking users ${users.map(({ externalid }) => externalid)}`,
+      );
       const addedBy = users.find(
         (user) => user.externalid === track.addedBy.uri,
       );
