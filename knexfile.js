@@ -8,12 +8,10 @@ const connection = {
   host: DB_HOST || 'localhost',
   user: DB_USER,
   port: parseInt(DB_PORT) || 1433,
-  password: DB_PASSWORD,
   database: DB_NAME,
 };
-console.info('Using knex against', {
-  connection,
-});
+console.info('Using knex against', connection);
+connection.password = DB_PASSWORD;
 module.exports = {
   client: 'pg',
   seeds: {

@@ -25,6 +25,7 @@ import { ServersService } from 'src/servers/servers.service';
 import { RecentDto } from '../dto/recent';
 import { SlashCommandPipe } from '@discord-nestjs/common';
 import { Cron } from '@nestjs/schedule';
+import { Logger, Injectable } from '@nestjs/common';
 
 dotenv.config();
 const { SPOTIFY_ID, SPOTIFY_SECRET } = process.env;
@@ -34,6 +35,7 @@ const { SPOTIFY_ID, SPOTIFY_SECRET } = process.env;
   description: 'Lists recent additions ot the playlist',
 })
 export class RecentCommand {
+  private readonly logger = new Logger(RecentCommand.name);
   constructor(
     @InjectKnex() private readonly knex: Knex,
     @InjectDiscordClient()
@@ -98,7 +100,7 @@ export class RecentCommand {
 
   async sendToChannel(tracks = [], channelId, serverid) {
     if (tracks.length === 0) {
-      console.info("Nothing new's been added to the playlist");
+      this.logger.log("Nothing new's been added to the playlist");
       // const channel = await this.discordClient.channels.cache.get(channelId);
       // await (channel as TextChannel).send(
       //   "Nothing new's been added to the playlist...",
@@ -153,7 +155,7 @@ export class RecentCommand {
         });
       // return;
       const channel = await this.discordClient.channels.cache.get(channelId);
-
+      this.logger.log(`Sending message to channel ${channelId}`);
       await (channel as TextChannel).send({
         embeds: [exampleEmbed],
         files: [file],
@@ -163,19 +165,21 @@ export class RecentCommand {
   // every day, check previous day's entries
   @Cron('*/10 * * * *')
   async intervalSync() {
+    this.logger.log('Starting internal recents sync');
     // for each server
     const servers = await this.serverService.getServers();
     for (const server of servers) {
-      console.info('OK 45!', server);
-
       const { playlistid, updateschannel, serverid } = server;
       if (updateschannel) {
         try {
+          this.logger.log(`For Server ${serverid}`);
           const newTracks = await this.getNewPlaylistTracks(playlistid);
+          this.logger.log(`New Tracks: ${newTracks.length}`);
           this.sendToChannel(newTracks, updateschannel, serverid);
           await sleep(60000);
         } catch (err) {
-          console.error(err);
+          this.logger.error('Failed sync:');
+          this.logger.error(err);
         }
       }
     }
