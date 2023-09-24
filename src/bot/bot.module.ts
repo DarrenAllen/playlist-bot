@@ -9,6 +9,7 @@ import { RecommendationCommand } from './commands/recommendation.command';
 import { PlaylistService } from 'src/playlist/playlist.service';
 import { ServersService } from 'src/servers/servers.service';
 import { ArtistCommand } from './commands/artists.command';
+import { IdeaCommand } from './commands/idea.command';
 
 @Module({
   imports: [DiscordModule.forFeature()],
@@ -22,6 +23,7 @@ import { ArtistCommand } from './commands/artists.command';
     PlaylistService,
     ServersService,
     ArtistCommand,
+    IdeaCommand,
   ],
 })
 export class BotModule {}
