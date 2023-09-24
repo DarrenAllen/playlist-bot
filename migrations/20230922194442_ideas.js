@@ -7,6 +7,7 @@ exports.up = async function (knex) {
     table.string('message');
     table.json('context');
     table.integer('serverid').references('servers.serverid');
+    table.integer('userid').references('users.userid');
   });
 };
 
