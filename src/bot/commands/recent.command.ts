@@ -117,7 +117,7 @@ export class RecentCommand {
       const addedBy = users.find(
         (user) => user.externalid == track.addedBy?.uri,
       );
-
+      this.logger.log(`Added By ${addedBy}`);
       let fileName = '';
       switch (addedBy?.nickname) {
         case 'ax':
@@ -147,7 +147,7 @@ export class RecentCommand {
         .setTitle(track.track.name)
         .setURL(track.track.externalURL.spotify)
         .setAuthor({
-          name: addedBy?.username || 'Unknown',
+          name: addedBy?.username || 'Mystery User',
           iconURL: `attachment://${fileName}`,
         })
         .setDescription(
