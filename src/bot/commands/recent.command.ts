@@ -110,13 +110,14 @@ export class RecentCommand {
 
     for (const track of tracks) {
       await sleep(2000);
-      this.logger.log(`Track found ${track.addedBy.uri}`);
+      this.logger.log(`Track found ${track.addedBy?.uri}`);
       this.logger.log(
         `Checking users ${users.map(({ externalid }) => externalid)}`,
       );
       const addedBy = users.find(
-        (user) => user.externalid == track.addedBy.uri,
+        (user) => user.externalid == track.addedBy?.uri,
       );
+
       let fileName = '';
       switch (addedBy?.nickname) {
         case 'ax':
@@ -146,7 +147,7 @@ export class RecentCommand {
         .setTitle(track.track.name)
         .setURL(track.track.externalURL.spotify)
         .setAuthor({
-          name: addedBy.username || 'Unknown',
+          name: addedBy?.username || 'Unknown',
           iconURL: `attachment://${fileName}`,
         })
         .setDescription(
