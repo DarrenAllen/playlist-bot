@@ -2,9 +2,7 @@ const {
   GUILD_ID_WITH_COMMANDS,
   SERVER_PLAYLIST,
   SERVER_NAME,
-  H_GUILD_ID,
-  H_SERVER_PLAYLIST,
-  H_SERVER_NAME,
+  UPDATES_CHANNEL,
 } = process.env;
 exports.seed = async function (knex) {
   const toInsert = [];
@@ -12,11 +10,7 @@ exports.seed = async function (knex) {
     name: SERVER_NAME,
     guildid: GUILD_ID_WITH_COMMANDS,
     playlistid: SERVER_PLAYLIST,
-  });
-  toInsert.push({
-    name: H_SERVER_NAME,
-    guildid: H_GUILD_ID,
-    playlistid: H_SERVER_PLAYLIST,
+    updateschannel: UPDATES_CHANNEL,
   });
   // Deletes ALL existing entries
   return knex('servers')

@@ -115,10 +115,10 @@ export class RecentCommand {
         `Checking users ${users.map(({ externalid }) => externalid)}`,
       );
       const addedBy = users.find(
-        (user) => user.externalid === track.addedBy.uri,
+        (user) => user.externalid == track.addedBy.uri,
       );
       let fileName = '';
-      switch (addedBy.nickname) {
+      switch (addedBy?.nickname) {
         case 'ax':
           fileName = 'ax.webp';
           break;
