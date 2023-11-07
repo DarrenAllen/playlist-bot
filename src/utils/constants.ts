@@ -26,4 +26,5 @@ export const TABLES = {
   tracks: 'tracks',
   servers: 'servers',
   artists: 'artists',
+  ideas: 'ideas',
 };

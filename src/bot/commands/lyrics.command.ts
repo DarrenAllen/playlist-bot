@@ -14,6 +14,7 @@ import * as dotenv from 'dotenv';
 import { SlashCommandPipe } from '@discord-nestjs/common';
 import { LyricDto } from '../dto/lyric.dto';
 import { ServersService } from 'src/servers/servers.service';
+import { TABLES } from 'src/utils/constants';
 
 dotenv.config();
 
@@ -31,13 +32,20 @@ export class LyricsCommand {
     private readonly serverService: ServersService,
   ) {}
   async saveIdea(message: any, context: any, serverid: any) {
-    await this.knex('ideas').insert({
+    // find userId for user who made the idea
+    const user = await this.knex(TABLES.users)
+      .select()
+      .where({ discordid: context.user.id })
+      .first();
+    console.info(user);
+    await this.knex(TABLES.ideas).insert({
       message,
       context: JSON.stringify(
         context,
         (key, value) => (typeof value === 'bigint' ? value.toString() : value), // return everything else unchanged
       ),
       serverid,
+      userid: user.userid,
     });
   }
   @Handler()
