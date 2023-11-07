@@ -1,18 +1,11 @@
-import { Inject } from '@nestjs/common';
-import { Cache } from 'cache-manager';
-import {
-  Command,
-  EventParams,
-  Handler,
-  InjectDiscordClient,
-} from '@discord-nestjs/core';
-import { ClientEvents, Client as DiscordClient } from 'discord.js';
-import { Client } from 'spotify-api.js';
+import { Injectable, Inject, Logger } from '@nestjs/common';
 import { InjectKnex, Knex } from 'nestjs-knex';
 import { CACHE_MANAGER } from '@nestjs/cache-manager';
-import { TABLES } from 'src/utils/constants';
+import { Cache } from 'cache-manager';
 import * as dotenv from 'dotenv';
+import { TABLES } from 'src/utils/constants';
 import { pick } from 'lodash';
+import { Client } from 'spotify-api.js';
 
 dotenv.config();
 const { SPOTIFY_ID, SPOTIFY_SECRET } = process.env;
@@ -22,15 +15,11 @@ function sleep(ms) {
     setTimeout(resolve, ms);
   });
 }
-@Command({
-  name: 'artists',
-  description: 'Updates stored artists data, use sparingly',
-})
-export class ArtistCommand {
+@Injectable()
+export class ArtistsService {
+  private readonly logger = new Logger(ArtistsService.name);
   constructor(
     @InjectKnex() private readonly knex: Knex,
-    @InjectDiscordClient()
-    private readonly discordClient: DiscordClient,
     @Inject(CACHE_MANAGER) private cacheManager: Cache,
   ) {}
   async getArtistData(artistId) {
@@ -49,23 +38,27 @@ export class ArtistCommand {
     return artist;
   }
 
-  async archiveArtist() {
+  async archiveArtists() {
+    this.logger.log('Archiving artist data');
     const existingArtists = await this.knex('artists').select('uri');
 
     const playlistArtists = await this.knex.raw(
       `SELECT distinct value->>'uri' as uri
       FROM   tracks r, json_array_elements(r.track->'track'->'artists') obj`,
     );
+    this.logger.log(playlistArtists);
     const artistsToProcess = (
       playlistArtists.rows as {
         [key: string]: string;
       }[]
     ).filter(({ uri }) => !existingArtists.map(({ uri }) => uri).includes(uri));
 
-    for (const artist of artistsToProcess.slice(1)) {
+    console.info(artistsToProcess.slice(1));
+    for (const artist of artistsToProcess) {
       // like spotify:track:3XH68VARiffUSObLtIkp2J => 3XH68VARiffUSObLtIkp2J
       const artistId = artist.uri.split(':').slice(-1)[0];
       let data;
+
       try {
         data = await this.getArtistData(artistId);
       } catch (error) {
@@ -81,19 +74,5 @@ export class ArtistCommand {
 
       await sleep(3000);
     }
-  }
-
-  @Handler()
-  async onArtistCommand(
-    @EventParams() args: ClientEvents['interactionCreate'],
-  ): Promise<string> {
-    // regex to get track ID from spotify link like https://open.spotify.com/track/73tHRPP7skoXscwbLE2VBr?si=1c441263e6474d36
-    // const regex = /[^\/][\w]+(?=\?|$)/gm;
-    // const id = dto.song.match(regex)[0];
-    // const playlistId = GUILDS.find(
-    //   (guild) => guild.guildid === args[0].guildId,
-    // ).playlistid;
-    setImmediate((_) => this.archiveArtist());
-    return `Updating stored artists data of tracks on playlist`;
   }
 }

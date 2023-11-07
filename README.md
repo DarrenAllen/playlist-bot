@@ -3,7 +3,16 @@
 A Discord bot for servers with collaborative playlists.
 Secondary function: a bot for bands.
 
-Currently, only works on a single server at a time. The planned playlist functionality is mostly complete. Documentation? I'd rather be building.
+Comands:
+
+/recent
+/features
+/analysis
+/artists
+/playlistfeatures
+/recommendation
+/lyrics
+/subscribe
 
 ## Installation
 

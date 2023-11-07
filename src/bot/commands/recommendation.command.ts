@@ -133,7 +133,7 @@ export class RecommendationCommand {
       // If there are only two users, use two tracks, otherwise one
       if (users.length === 2) {
         const currentTracks = shuffled.slice(0, 2);
-
+        console.info('currentTracks', currentTracks);
         selectedTracks.push(currentTracks[0]);
         selectedTracks.push(currentTracks[1]);
       } else {

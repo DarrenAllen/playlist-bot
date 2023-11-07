@@ -26,6 +26,7 @@ import { RecentDto } from '../dto/recent';
 import { SlashCommandPipe } from '@discord-nestjs/common';
 import { Cron } from '@nestjs/schedule';
 import { Logger, Injectable } from '@nestjs/common';
+import { ArtistsService } from 'src/artists/artists.service';
 
 dotenv.config();
 const { SPOTIFY_ID, SPOTIFY_SECRET } = process.env;
@@ -43,6 +44,7 @@ export class RecentCommand {
     @Inject(CACHE_MANAGER) private cacheManager: Cache,
     private userService: UsersService,
     private readonly serverService: ServersService,
+    private readonly artistService: ArtistsService,
   ) {}
   async getAllPlaylistTracks(playlistid) {
     let offset = 0;
@@ -167,7 +169,7 @@ export class RecentCommand {
       });
     }
   }
-  // every day, check previous day's entries
+  // every 10 minutes, check for new entries
   @Cron('*/10 * * * *')
   async intervalSync() {
     this.logger.log('Starting internal recents sync');
@@ -187,6 +189,10 @@ export class RecentCommand {
           this.logger.error(err);
         }
       }
+      setImmediate(async () => {
+        // update artists
+        await this.artistService.archiveArtists();
+      });
     }
   }
 

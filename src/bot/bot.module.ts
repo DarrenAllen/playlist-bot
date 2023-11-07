@@ -8,11 +8,12 @@ import { UsersService } from 'src/users/users.service';
 import { RecommendationCommand } from './commands/recommendation.command';
 import { PlaylistService } from 'src/playlist/playlist.service';
 import { ServersService } from 'src/servers/servers.service';
-import { ArtistCommand } from './commands/artists.command';
-import { IdeaCommand } from './commands/idea.command';
-
+import { LyricsCommand } from './commands/lyrics.command';
+import { SubscriptionCommand } from './commands/subscriptions.command';
+import { ContextModule } from 'src/context/context.module';
+import { ArtistsService } from 'src/artists/artists.service';
 @Module({
-  imports: [DiscordModule.forFeature()],
+  imports: [DiscordModule.forFeature(), ContextModule],
   providers: [
     RecentCommand,
     AnalysisCommand,
@@ -22,8 +23,9 @@ import { IdeaCommand } from './commands/idea.command';
     RecommendationCommand,
     PlaylistService,
     ServersService,
-    ArtistCommand,
-    IdeaCommand,
+    LyricsCommand,
+    SubscriptionCommand,
+    ArtistsService,
   ],
 })
 export class BotModule {}

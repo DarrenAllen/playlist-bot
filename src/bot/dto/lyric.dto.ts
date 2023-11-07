@@ -1,6 +1,6 @@
 import { Param } from '@discord-nestjs/core';
 
-export class IdeaDto {
+export class LyricDto {
   @Param({
     name: 'idea',
     description: 'Whatcha got?',

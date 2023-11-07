@@ -41,6 +41,10 @@ export class PlaylistFeaturesCommand {
 
     return features;
   }
+
+  // Once a day, archive all features
+  async archiveAllFeatures() {}
+
   async archiveFeatures(playlistid) {
     const tracksToProcess = await this.knex(TABLES.tracks)
       .select('uri')

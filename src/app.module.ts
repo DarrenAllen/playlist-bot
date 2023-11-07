@@ -12,6 +12,8 @@ import { PlaylistService } from './playlist/playlist.service';
 import { ServersService } from './servers/servers.service';
 import * as dotenv from 'dotenv';
 import { ScheduleModule } from '@nestjs/schedule';
+import { ContextModule } from './context/context.module';
+import { ArtistsService } from './artists/artists.service';
 
 dotenv.config();
 const { DB_PORT, DB_PASSWORD, DB_NAME, DB_USER, DB_HOST } = process.env;
@@ -56,8 +58,15 @@ const { DB_PORT, DB_PASSWORD, DB_NAME, DB_USER, DB_HOST } = process.env;
     }),
     BotModule,
     ScheduleModule.forRoot(),
+    ContextModule,
   ],
   controllers: [AppController],
-  providers: [AppService, UsersService, PlaylistService, ServersService],
+  providers: [
+    AppService,
+    UsersService,
+    PlaylistService,
+    ServersService,
+    ArtistsService,
+  ],
 })
 export class AppModule {}

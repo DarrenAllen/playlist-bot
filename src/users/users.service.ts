@@ -22,9 +22,19 @@ export class UsersService {
       return users;
     }
   }
-  async getUser({ uri, nickname }: { uri?: string; nickname?: string }) {
+  async getUser({
+    uri,
+    nickname,
+    discordid,
+  }: {
+    uri?: string;
+    nickname?: string;
+    discordid?: string;
+  }) {
     const q: any = {};
-    if (uri) {
+    if (discordid) {
+      q.discordid = discordid;
+    } else if (uri) {
       q.externalid = uri;
     } else if (nickname) {
       q.nickname = nickname;
